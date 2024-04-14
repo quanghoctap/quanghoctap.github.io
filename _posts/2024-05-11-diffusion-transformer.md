@@ -1,6 +1,6 @@
 ---
-title: "Scalable Diffusion Models with Transformers"
-date: 2024-05-15
+title: "Test YYYY-MM-DD (D<=12)"
+date: 2024-05-11
 categories: [Data Science, Deep Learning]
 tags: [diffusion, transformer, paper explained]
 toc: true
