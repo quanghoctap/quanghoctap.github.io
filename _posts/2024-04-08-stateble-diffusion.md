@@ -1,6 +1,6 @@
 ---
-title: 'High Resolution Image Synthesis with Latent Diffusion Models'
-date: 2024-04-09 
+title: 'Paper Explained 6: High Resolution Image Synthesis with Latent Diffusion Models'
+date: 2024-04-08
 categories: [Data Science, Deep Learning]
 tags: [advanced, paper explained]     # TAG names should always be lowercase
 toc: true

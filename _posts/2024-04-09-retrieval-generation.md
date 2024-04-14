@@ -1,6 +1,6 @@
 ---
 title: "Test YYYY-MM-DD(D>12)"
-date: 2024-04-13
+date: 2024-04-30
 categories: [Data Science, Deep Learning]
 tags: [advanced, paper explained]
 toc: true
