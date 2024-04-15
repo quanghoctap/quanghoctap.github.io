@@ -13,6 +13,11 @@ Stable Diffusion là một mô hình trí tuệ nhân tạo (AI) tạo sinh đư
 # Giới thiệu về Stable Diffusion
 Trước tiên để bắt đầu cho việc tìm hiểu về Stable Diffusion, thì mình sẽ giới thiệu về mô hình sinh trước. Sau đó mình sẽ giới thiệu về động lực để các tác giả tạo ra mô hình này (fun fact ☝️🤓: stable diffusion là bản cải tiến từ mô hình diffusion có từ 2015) và sau đó là cơ chế hoạt động của mô hình này, cuối cùng sẽ là phần code để implement lại từ đầu mô hình này. 
 
+Một vài ứng dụng của Stable Diffusion (mà có thể các bạn đã thấy hoặc chưa thấy):
+![example](/assets/img/paper%20explained%206/example.png)
+_Example for 1.45B Model with user input_
+
+Và ngoài ra thì cũng có nhiều phiên bản cải tiến khác, xịn hơn nữa. 
 # Các kiến thức liên quan 
 ## 1. Mô hình sinh (Generative model)
 
@@ -73,8 +78,62 @@ Mục tiêu khi OpenAI huấn luyện CLIP để nó trở thành một pre-trai
 Với các lý do được nêu ở trên, CLIP không phải được thiết kế để giải quyết một vấn đề cụ thể nào cả, mô hình này có thể được sử dụng để giải quyết các bài toán ngách khác mà vẫn dể thở. 
 
 ## 5. Variational Autoencoder(VAE)
+Cũng trong hình mà mọi người thấy ở trên về cấu trúc của mô hình stable diffusion, nó sẽ có 2 phần đó là `Image Encoder` và `Image Decoder`. 
+
+Quay trở lại với lí do mà nhóm tác giả viết bài này, có thể thấy rằng việc mà họ denoise trên một latent variable có kích thước bằng đúng với kích thước đầu vào sẽ làm cho việc denoise bức ảnh trở nên rất tốn kém, đặc biệt là khi mà kích thước bức ảnh lớn và bước timestep $T$ là rất lớn. Lúc này họ mới nghĩ tới việc **thay vì học phân phối $p(x)$ từ chính dữ liệu hình ảnh, thay vào đó, ta nên học phân phối của latent variable trên tập dữ liệu, sử dụng VAE**. 
+
+![VAE](/assets/img/paper%20explained%206/VAE.jpg)
+_VAE architecture_
+
+Bằng cách áp dụng VAE để giảm số chiều dữ liệu xuống, chúng ta trực tiếp làm giảm kích thước ma trận để cho quá trình denoise, cụ thể là từ một bức ảnh `512 x 512` xuống thành một ma trận `64 x 64` .Vậy câu hỏi ở đây là: "*Tại sao VAE? 🤨 AE thường thì sao không được?*". 
+
+Rõ ràng đối với objective của chúng ta, Autoencoder cũng là một lựa chọn hợp lí, tuy nhiên có lí do để chúng ta không sử dụng Autoencoder. Nguyên nhân chính yếu nhất để chúng ta không sử dụng Autoencoder đó là **biểu diễn trong không gian tiềm ẩn (latent space) không có mang ý nghĩa gì cả**. Mô hình của chúng ta sẽ chỉ gán cho cái ảnh đầu vào một vector input ngẫu nhiên (không hẳn là ngẫu nhiên, nhưng mà vấn đề là Autoencoder không có học được mối quan hệ có nghĩa nào giữa các điểm dữ liệu cả, trong chính cái objective của AE là nó cố gắng tái hiện lại input của nó mà, kiểu như mô hình này chỉ biết tới bản thân của nó thôi 😻👌). Dưới đây là kiến trúc của một mạng AE truyền thống: 
+
+![AE](/assets/img/paper%20explained%206/autoencoder.png)
+_AE architecture_
+
+Điểm khác nhau của 2 mô hình VAE và AE nằm ở chỗ VAE thật sự cho phép chúng ta học ra một latent space có ý nghĩa.
+
+## 6. Latent Space
+Vậy câu hỏi kế tiếp (không quá liên quan đến bài này, nhưng biết thì cũng không hại gì): *"Latent Space là gì 😐?"*
+
+Hiểu đơn giản, Latent Space (hay không gian ẩn) thường là một không gian có số chiều thấp hơn chiều của dữ liệu đầu vào và vẫn giữ được đặc tính của dữ liệu input đó, và chúng ta có thể làm được việc này thông qua các mô hình như VAE hay AE. 
+
+![mnist_latent](/assets/img/paper%20explained%206/mnist-latent.png)
+_Latent space of MNIST_
+
+Như trong hình này là một latent space có ý nghĩa, các vector biểu diễn sau khi được nén vào trong latent space sẽ nằm gần nhau, ngụ ý rằng các sample gần giống nhau thì sẽ nằm gần nhau trong một không gian ẩn. Do đó khi chúng ta thực hiện lấy mẫu, nếu mà mẫu chúng ta lấy thuộc vào một cụm nào đó, thì khả năng rất cao chúng ta sẽ tái tạo lại được ảnh rất liên quan đến cụm đó. 
+
+## 7. Denoising UNET 
+
+Vai trò của UNET trong mô hình stable diffusion là rất quan trọng (và có vẻ như mô hình nào thuộc dạng Diffusion-based cũng sử dụng UNET để denoise). Có nhiều bài khác đã nói về UNET mà mọi người có thể tìm đọc(hoặc đợi mình lên bài 🥹). Lý do mà mô hình có tên UNET là bởi vì cấu trúc của nó tạo thành hình chữ U: 
+
+![UNET](/assets/img/paper%20explained%206/UNET.png)
+_UNET architecture_
+
+Và ở một phương diện nào đó, đây cũng chính là một dạng Autoencoder! 
+
+Nhưng mà nếu chỉ có vậy thì điều gì đã khiến UNET trở nên đặc biệt hơn? Câu trả lời nằm ở những đường màu xám ở hình trên. Những đường xám này chính là những kết nối tắc (Residual Connection). 
+
+Những đường Residual Connection này, hiểu đơn giản là một cái cheatcode, vai trò của những đường kết nối này là hỗ trợ nửa sau của phần Decoder trong mạng UNET, cụ thể hơn là ở giai đoạn Encode, ở những bước đầu tiên, chúng ta thật sự có đầy đủ thông tin của bức ảnh đầu vào, có thể nói ở những bước này, mô hình phần nào đó bảo toàn những đặc trưng của ảnh. Nhưng vấn đề nằm ở nửa sau, phần Decode cố gắng phóng lớn lại cái ảnh đang được biểu diễn trong latent space, vấn đề là làm sao để phần Decode biết mình đi đúng hướng? Những cái kết nối tắc này sẽ giúp phần Decode biết là ở layer đó thì biểu diễn ma trận nên là như thế nào, ra sao. Từ đó nó không đi lạc nữa. 
+
+Fun fact 🤓☝️: UNET ban đầu được thiết kế cho bài toán segmentation, nhưng do những tính chất mà mình vừa nêu, mọi người đã mang nó vô hầu hết các bài toán tạo ra ảnh cho các mô hình diffusion-base. 
+
+## 8. Transformer 
+Cũng đã có nhiều bài post viết chi tiết và cụ thể về mô hình Transformer rồi, mọi người có thể tìm đọc, trong khuôn khổ bài toán này, mình sẽ nói vắng tắt về cross-attention trong Transformer và cách nó được áp dụng trong bài này.
+
+**Vai trò của cơ chế cross-attention**: Hiểu đơn giản, tưởng tượng bạn đang đọc một bức tranh, và đồng thời đọc luôn caption của bức tranh đó. Lúc này có thể bạn đang so sánh đối tượng trong tranh với các từ bạn quan sát được trong câu mô tả để xem nó có trùng không. 
+
 
 # Cách thức hoạt động
+
+Ok, sau khi đã có hiểu biết về các thành phần trong mô hình Stable Diffusion, giờ ta sẽ đi đến phần chính, đó là cấu trúc cụ thể của mô hình, mọi người có thể nhìn vào hình dưới đây: 
+
+![stable_diffusion_full](/assets/img/paper%20explained%206/stable_diffusion_full.png)
+_Full Component of Stable Diffusion Architecture_
+
+Ở đây, có một điểm lưu ý đó là phần Encoder $\tau_\theta$. Ở trên mình có nói cụ thể cái đó là phần Text Encoder, nhưng trong paper gốc thì họ lại ghi là $\tau_\theta$, lý do cho việc này nằm ở chỗ phần Text thật ra là một trong những điều kiện giúp chúng ta điều chỉnh lại quá trình denoise. Nhưng ngoài thật ra, ngoài Text, chúng ta có thể thay đổi điều kiện đó thành những điều kiện khác sao cho phù hợp với task của chúng ta. Lấy ví dụ như với bài toán tô màu ảnh, mình hoàn toàn có thể thiết kế lại mô hình này sao cho nó nhận vào 2 bức ảnh, một bức ảnh đóng vai trò input, một bức ảnh đóng vai trò là điều kiện để điều chỉnh cho phù hợp với ý muốn của mình. **Có thể nói, Stable Diffusion bên cạnh giải quyết vấn đề về tính toán của Diffusion model, mô hình này còn cho phép đa dạng dữ liệu đầu vào, nhờ vào việc phần conditioning có thể đa dạng** 
+
 
 # Code 
 
