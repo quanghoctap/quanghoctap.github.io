@@ -16,7 +16,7 @@ timezone:
 
 title: Nhat Quang # the main title
 
-tagline: Learner, lover # it will display as the sub-title
+tagline: Industry researcher in Finance and AI # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   This is my learning website where i share about everything i have learned.
@@ -41,8 +41,8 @@ social:
     - https://twitter.com/QuangNht511640 # change to your twitter homepage
     - https://github.com/quanghoctap # change to your github homepage
     # Uncomment below to add more social links
-    # - https://www.facebook.com/username
-    # - https://www.linkedin.com/in/username
+    #- https://www.facebook.com/username
+    - https://www.linkedin.com/in/quangnhatnguyen
 
 google_site_verification: # fill in to your verification string
 
@@ -66,7 +66,7 @@ goatcounter:
 #     light  - Use the light color scheme
 #     dark   - Use the dark color scheme
 #
-theme_mode: # [light | dark]
+theme_mode: dark # [light | dark]
 
 # The CDN endpoint for images.
 # Notice that once it is assigned, the CDN url
