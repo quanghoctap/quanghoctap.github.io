@@ -1,6 +1,6 @@
 ---
 title: "Test YYYY-MM-DD (D<=12)"
-date: 2025-04-14
+date: 2027-04-14
 categories: [Data Science, Deep Learning]
 tags: [diffusion, transformer, paper explained]
 toc: true
