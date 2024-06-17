@@ -5,7 +5,7 @@ categories: [Data Science, Deep Learning]
 tags: [diffusion, transformer, paper explained]
 toc: true
 math: true
-publish: true
+publish: false
 ---
 
 let see
